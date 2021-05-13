@@ -1,0 +1,51 @@
+﻿@font-face {
+    font-family: "superlume";
+    src: url("../font/superlume.woff2");
+}
+
+#loginContainer {
+    width: 40vw;
+    height: 60vh;
+    background-color: rgba(200, 150, 150, 0.5);
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    padding: 12px;
+    margin:auto;
+    display:grid;
+    grid-template-columns: 33% 33% 33%;
+    grid-template-rows: 10% 25% 25% 10%;
+    align-items: center;
+}
+
+#loginTitle {
+    text-align: center;
+    font-family: "superlume";
+    color: white;
+    grid-column: 2;
+}
+
+#loginEmail {
+    grid-column: 1/span 3;
+    grid-row: 2;
+}
+
+#loginPassword {
+    grid-column: 1/span 3;
+    grid-row: 3;
+}
+
+#submitBtn {
+    grid-column: 2;
+    grid-row: 4;
+    background-color: #4e7;
+    border-radius: 12px;
+    font-family: sans-serif;
+    color: white;
+}
+
+body {
+    background-image: url(https://upload.wikimedia.org/wikipedia/commons/c/c3/Black-and-white-dark-car-vehicle_%2824244198281%29.jpg);
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+}
