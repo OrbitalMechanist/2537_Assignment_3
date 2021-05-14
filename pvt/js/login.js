@@ -2,23 +2,24 @@
 
 'use strict';
 
-import { send } from "process";
-
 function sendLoginAttempt() {
 
     console.log("attempting login");
 
-    emailToSend = $('#loginEmail').val();
-    pwordToSend = $('#loginPassword').val();
+    let emailToSend = $('#loginEmail').val();
+    let pwordToSend = $('#loginPassword').val();
+
+    console.log("Email:", emailToSend, "Password:", pwordToSend);
 
     $.ajax({
-        url: "/authenticate",
+        url: "/auth-user",
         type: "POST",
         dataType: "JSON",
         data: { email: emailToSend, pword: pwordToSend },
         success: function (data) {
-            if (data['status'] == "success") {
-                window.location.replace("/profile");
+            console.log(data);
+            if (data.status == "success") {
+                console.log("Login successful.");
             } else {
                 $("#status").text("Incorrect email/password combination.");
             }
@@ -29,7 +30,10 @@ function sendLoginAttempt() {
     });
 }
 
-$('#submitBtn').click(function () {
-    console.log("Button clicked");
-    sendLoginAttempt();
+console.log("Login script loaded");
+$(document).ready(function () {
+    $("#submitBtn").click(function () {
+        console.log("Button clicked");
+        sendLoginAttempt();
+    });
 });

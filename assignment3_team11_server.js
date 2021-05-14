@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const session = require('express-session');
+const bodyParser = require('body-parser');
 const app = express();
 const fs = require("fs");
 const msg404 = 'BAD PROBLEM!';
@@ -10,6 +11,9 @@ app.use('/css', express.static('pvt/css'));
 app.use('/img', express.static('pvt/img'));
 app.use('/js', express.static('pvt/js'));
 app.use('/font', express.static('pvt/font'));
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/favicon.ico', function (req, res) {
     res.setHeader('Content-Type', 'image/x-icon');
@@ -43,14 +47,15 @@ async function initDatabase() {
         PRIMARY KEY (ID));`;
 
     await dbConnection.query(createStatement);
-    let results = await connection.query("SELECT COUNT(*) FROM user");
+    let results = await dbConnection.query("SELECT COUNT(*) FROM user");
+    console.log(results);
     let count = results[0][0]['COUNT(*)'];
 
     if (count < 1) {
-        results = await connection.query("INSERT INTO user (email, password) values ('arron_ferguson@bcit.ca', 'admin')");
+        results = await dbConnection.query("INSERT INTO user (email, password) values ('arron_ferguson@bcit.ca', 'admin')");
         console.log("Added test user.");
     }
-    connection.end();
+    dbConnection.end();
 }
 
 app.get('/', function (req, res) {
@@ -73,22 +78,56 @@ app.get('/', function (req, res) {
 app.post('/auth-user', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
 
-    console.log("Email", req.body.email);
-    console.log("Password", req.body.password);
+    console.log("received login request");
 
-    const mysql = require('mysql2');  
+    console.log(req);
+
+    console.log("Email", req.body.email);
+    console.log("Password", req.body.pword);
+
+    let results = checkAuth(req.body.email, req.body.pword,
+        function (selection) {
+            if (selection == null) {
+                res.send({ status: "fail", msg: "NSA" });
+            } else {
+                req.session.loggedIn = true;
+                req.session.email = selection.email;
+                req.session.save();
+                res.send({ status: "success", msg: "OK" });
+            }
+        });
+
+});
+
+function checkAuth(email, pwd, callback) {
+
+    const mysql = require('mysql2');
     const dbConnection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'test'
+        database: 'g11asn3'
     });
-    console.log(req.body);
-    let checkResult = dbConnection.query("SELECT COUNT(*) FROM user WHERE email = ? AND password = ?", [req.body.email, req.body.pwd]);
 
-    
+    dbConnection.query(
+        "SELECT * FROM user WHERE email = ? AND password = ?", [email, pwd],
+        function (error, result) {
+            if (error) {
+                throw error;
+            }
 
-});
+            if (result.length > 0) {
+                return callback(result[0]);
+            } else {
+                return callback(null);
+            }
+            //he's making a list
+            //it's stored in plain text
+            //an elf just got phished
+            //you know what comes next
+            //Santa Claus has leaked 7 billion users' names, adresses and social security numbers.
+        });
+}
 
 app.use(function (req, res, next) {
     res.status(404).send(msg404);
@@ -96,5 +135,6 @@ app.use(function (req, res, next) {
 
 let port = 451;
 app.listen(port, function () {
+    initDatabase();
     console.log('Ready at port ' + port);
 });
