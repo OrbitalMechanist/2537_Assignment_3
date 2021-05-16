@@ -19,6 +19,9 @@ input {
     margin: 5px;
 }
 
-body
-{
+body {
+    background-image: url(https://upload.wikimedia.org/wikipedia/commons/c/c3/Black-and-white-dark-car-vehicle_%2824244198281%29.jpg);
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
 }
