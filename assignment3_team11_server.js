@@ -5,12 +5,13 @@ const bodyParser = require('body-parser');
 const app = express();
 const fs = require("fs");
 const msg404 = 'BAD PROBLEM!';
-
+const { JSDOM } = require('jsdom');
 
 app.use('/css', express.static('pvt/css'));
 app.use('/img', express.static('pvt/img'));
 app.use('/js', express.static('pvt/js'));
 app.use('/font', express.static('pvt/font'));
+app.use('/html', express.static('pvt/html'));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -93,6 +94,7 @@ app.post('/auth-user', function (req, res) {
                 req.session.loggedIn = true;
                 req.session.email = selection.email;
                 req.session.save();
+//                res.redirect('/contentful');
                 res.send({ status: "success", msg: "OK" });
             }
         });
@@ -128,6 +130,33 @@ function checkAuth(email, pwd, callback) {
             //Santa Claus has leaked 7 billion users' names, adresses and social security numbers.
         });
 }
+
+app.get('/contentful', function (req, res) {
+
+    console.log("got contentful request");
+
+    res.set('Server', 'CryEngine');
+    res.set('X-Powered-By', 'my tears');
+
+    if (!req.session.loggedIn) {
+        console.log("not logged in");
+        res.status(403).send((new JSDOM(fs.readFileSync('./pvt/html/403.html'))).serialize());
+        return;
+    }
+
+    let baseFile = fs.readFileSync('./pvt/html/contentful.html', "utf8");
+    let baseDOM = new JSDOM(baseFile);
+    let $base = require("jquery")(baseDOM.window);
+
+    let item = fs.readFileSync('./pvt/html/template_test_item.html', "utf8");
+    let itemDOM = new JSDOM(item);
+    let $item = require("jquery")(itemDOM.window);
+    // Replace!
+    $base("#replaceable").replaceWith($item("#test_item"));
+
+    res.send(baseDOM.serialize());
+
+});
 
 app.use(function (req, res, next) {
     res.status(404).send(msg404);

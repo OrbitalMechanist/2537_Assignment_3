@@ -20,6 +20,7 @@ function sendLoginAttempt() {
             console.log(data);
             if (data.status == "success") {
                 console.log("Login successful.");
+                window.location.replace('/contentful');
             } else {
                 $("#status").text("Incorrect email/password combination.");
             }
