@@ -22,7 +22,7 @@ function sendLoginAttempt() {
                 console.log("Login successful.");
                 window.location.replace('/contentful');
             } else {
-                $("#status").text("Incorrect email/password combination.");
+                console.log("wronggggggg");
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -31,10 +31,8 @@ function sendLoginAttempt() {
     });
 }
 
-console.log("Login script loaded");
 $(document).ready(function () {
     $("#submitBtn").click(function () {
-        console.log("Button clicked");
         sendLoginAttempt();
     });
 });

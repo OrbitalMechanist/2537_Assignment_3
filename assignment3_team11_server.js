@@ -49,7 +49,6 @@ async function initDatabase() {
 
     await dbConnection.query(createStatement);
     let results = await dbConnection.query("SELECT COUNT(*) FROM user");
-    console.log(results);
     let count = results[0][0]['COUNT(*)'];
 
     if (count < 1) {
@@ -79,10 +78,7 @@ app.get('/', function (req, res) {
 app.post('/auth-user', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
 
-    console.log("received login request");
-
-    console.log(req);
-
+    console.log("received login request:");
     console.log("Email", req.body.email);
     console.log("Password", req.body.pword);
 
@@ -94,7 +90,6 @@ app.post('/auth-user', function (req, res) {
                 req.session.loggedIn = true;
                 req.session.email = selection.email;
                 req.session.save();
-//                res.redirect('/contentful');
                 res.send({ status: "success", msg: "OK" });
             }
         });
@@ -123,11 +118,6 @@ function checkAuth(email, pwd, callback) {
             } else {
                 return callback(null);
             }
-            //he's making a list
-            //it's stored in plain text
-            //an elf just got phished
-            //you know what comes next
-            //Santa Claus has leaked 7 billion users' names, adresses and social security numbers.
         });
 }
 
@@ -140,7 +130,8 @@ app.get('/contentful', function (req, res) {
 
     if (!req.session.loggedIn) {
         console.log("not logged in");
-        res.status(403).send((new JSDOM(fs.readFileSync('./pvt/html/403.html'))).serialize());
+        //res.status(403).send((new JSDOM(fs.readFileSync('./pvt/html/403.html'))).serialize());
+        res.redirect('/');
         return;
     }
 
@@ -151,11 +142,26 @@ app.get('/contentful', function (req, res) {
     let item = fs.readFileSync('./pvt/html/template_test_item.html', "utf8");
     let itemDOM = new JSDOM(item);
     let $item = require("jquery")(itemDOM.window);
-    // Replace!
     $base("#replaceable").replaceWith($item("#test_item"));
+
+    let item2 = fs.readFileSync('./pvt/html/template_test_item2.html', "utf8");
+    let itemDOM2 = new JSDOM(item2);
+    let $item2 = require("jquery")(itemDOM2.window);
+    $base("#replaceable2").replaceWith($item2("#test_item2"));
+
+    $base("#logoutText").replaceWith(req.session.email);
 
     res.send(baseDOM.serialize());
 
+});
+
+app.post('/end-user', function (req, res) {
+    req.session.destroy(function (error) {
+        if (error) {
+            console.log(error);
+        }
+    });
+    res.send({ status: "success" });
 });
 
 app.use(function (req, res, next) {

@@ -47,7 +47,7 @@
 #submitBtn {
     grid-column: 2;
     grid-row: 4;
-    background-color: rgb(52, 221, 103);
+    background-color: #4e7;
     border-radius: 12px;
     font-family: sans-serif;
     color: white;
@@ -55,9 +55,11 @@
     padding: 10px;
     font-size: 30px;
     text-shadow: 2px 2px 1px black;
-    border-style: solid;
-    border-color: rgb(16, 130, 16);
     box-shadow: inset 0 0 20px rgba(6, 105, 13, 0.823);
+}
+
+#submitBtn:hover {
+    background-color: #5f8;
 }
 
 body {
